@@ -63,7 +63,9 @@ So on a high level, the following are the steps I am going to do. Expand the sec
 </details>
 
 
+## How to run the playbook
 
+ansible-playbook -i hosts init.yaml -K
 
 
 

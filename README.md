@@ -15,21 +15,52 @@ I am going to create a Kubernetes cluster with a single control plane node and t
 I am a big fan of automating trivial tasks. I was exploring the possibility of automating many of the node setup tasks during the cluster creation. I found Ansible is a good framework to do the automation and am going to use the same throughout whenever possible. Cluster creation is fully automated using Ansible ( Virtual machine creation and setup host-only network is not part of Ansible script yet)
 
 ## What are the steps?
-So on a high level, the following are the steps I am going to do
+So on a high level, the following are the steps I am going to do. Expand the section to see details
 
-1. Setup virtual machines
-   - Install VirtualBox
-	 - Create virtual machines with ubuntu server 20.04 focal fossa
-	 - Setup host-only network
-2. Disable swap on the control plane and worker nodes
-3. Install docker
-4. Install k8s
-5. Configure the control plane node
-6. Join the worker nodes with control plane node
-7. Enable shell auto completion
-8. Configure to use systemd as cgroupdriver for k8s
+<details>
+  <summary>Install VirtualBox</summary>
 
-
+  - Downlod and  VirtualBox-6.1.16 from https://www.virtualbox.org/wiki/Downloads
+</details>
+<details>
+  <summary>Create virtual machines with ubuntu server 20.04 focal fossa</summary>
+  
+  - Downlod iso file from https://releases.ubuntu.com/20.04/
+  - Create a new virtual machine using virtualbox using the iso downloaded in above step. Instructions for creating a VM can be found here https://oracle-base.com/articles/vm/virtualbox-creating-a-new-vm. 
+    - Make sure to install openvpn server using operating system setup during vm creation
+</details>
+<details>
+  <summary>Setup host-only network</summary>
+  
+</details>
+<details>
+  <summary>Disable swap on the control plane and worker nodes</summary>
+  
+</details>
+<details>
+  <summary>Install docker</summary>
+  
+</details>
+<details>
+  <summary>Install k8s</summary>
+  
+</details>
+<details>
+  <summary>Configure the control plane node</summary>
+  
+</details>
+<details>
+  <summary>Join the worker nodes with control plane node</summary>
+  
+</details>
+<details>
+  <summary>Enable shell auto completion</summary>
+  
+</details>
+<details>
+  <summary>Configure to use systemd as cgroupdriver for k8s</summary>
+  
+</details>
 
 
 

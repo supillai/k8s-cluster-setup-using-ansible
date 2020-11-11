@@ -1,0 +1,18 @@
+---
+- hosts: "{{hostlist}}"
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+    - name: Disable swap
+      command: swapoff -a
+
+    - name: Permanently disable Swap entry from /etc/fstab
+      lineinfile:
+        dest: /etc/fstab
+        regexp: swap
+        state: absent
+...

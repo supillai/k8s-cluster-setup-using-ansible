@@ -1,0 +1,68 @@
+---
+- hosts: "{{hostlist}}"
+  remote_user: "{{ansible_user}}"
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+    - name: Installing Docker Dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - gnupg2
+        state: present
+
+    - name: Add Docker’s official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        keyring: /etc/apt/trusted.gpg.d/docker.gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+        filename: docker
+        mode: 0600
+
+    - name: Install Docker CE
+      apt:
+        name:
+          - docker-ce=5:19.03.11~3-0~ubuntu-focal
+          - docker-ce-cli=5:19.03.11~3-0~ubuntu-focal
+          - containerd.io=1.2.13-2
+        state: present
+
+    - name: Create Docker Daemon file
+      copy:
+        dest: "/etc/docker/daemon.json"
+        content: |
+          {
+            "exec-opts": ["native.cgroupdriver=systemd"],
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "100m"
+            },
+            "storage-driver": "overlay2"
+          }
+          EOF
+  
+    - name: Creates Docker Daemon directory
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: 0777
+
+    - name: reload systemd
+      command: systemctl daemon-reload
+
+    - name: Enable service docker, and enable persistently
+      service:
+        name: docker
+        enabled: yes
+...

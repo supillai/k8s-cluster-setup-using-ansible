@@ -1,0 +1,15 @@
+---
+- hosts: "{{hostlist}}"
+  remote_user: "{{ansible_user}}"
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+    - name: Configure kubectl command auto-completion.
+      lineinfile:
+        dest: /home/{{ ansible_user }}/.bashrc
+        line: "source <(kubectl completion bash)"
+        insertafter: EOF
+...

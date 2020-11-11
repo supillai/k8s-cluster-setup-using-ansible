@@ -1,0 +1,54 @@
+---
+- hosts: "{{hostlist}}"
+  remote_user: "{{ansible_user}}"
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh
+
+  vars_prompt:
+    - name: "k8s_master_ip"
+      prompt: "Enter the Apiserver advertise address, example: 192.168.56.20"
+      private: no
+      default: "192.168.56.20"
+
+  tasks:
+    - name: Intilizing Kubernetes Cluster
+      command: kubeadm init --pod-network-cidr "192.168.57.0/24"  --apiserver-advertise-address "{{ k8s_master_ip }}" --v 5
+      run_once: true
+      delegate_to: "{{ k8s_master_ip }}"
+
+    - pause: seconds=5
+
+    - name: Create directory for kube config.
+      become_method: sudo
+      become: yes
+      file:
+        path: /home/{{ansible_user }}/.kube
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0755
+
+    - name: Copy /etc/kubernetes/admin.conf to user's home directory /home/{{ ansible_user }}/.kube/config.
+      become_method: sudo
+      become: yes
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/{{ ansible_user }}/.kube/config
+        remote_src: yes
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0644"
+
+    - pause: seconds=2
+
+    - name: Create Pod Network & RBAC.
+      become_user: "{{ansible_user}}"
+      become_method: sudo
+      become: yes
+      command: "{{ item }}"
+      with_items:
+        - kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml --v 5
+        - kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --v 5
+...

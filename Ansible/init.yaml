@@ -1,0 +1,12 @@
+---
+- import_playbook: disable_swap.yaml hostlist="masters, workers"
+- import_playbook: install_docker.yaml hostlist="masters, workers"
+- import_playbook: install_k8s.yaml hostlist="masters, workers"
+- import_playbook: configure_k8s_master.yaml hostlist="masters"
+- import_playbook: create_and_save_join_token.yaml hostlist="masters"
+- import_playbook: join_worker_nodes_with_master.yaml hostlist="workers"
+- import_playbook: enable_shell_autocompletion_master.yaml hostlist="masters"
+- import_playbook: set_systemd_as_cgroupdriver_k8s.yaml hostlist="masters, workers"
+...
+
+

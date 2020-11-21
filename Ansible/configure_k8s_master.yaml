@@ -1,6 +1,6 @@
 ---
 - hosts: "{{hostlist}}"
-  remote_user: ubuntu
+  remote_user: "{{ansible_user}}"
   become: yes
   become_method: sudo
   gather_facts: yes
@@ -44,7 +44,7 @@
     - pause: seconds=2
 
     - name: Create Pod Network & RBAC.
-      become_user: ubuntu
+      become_user: "{{ansible_user}}"
       become_method: sudo
       become: yes
       command: "{{ item }}"

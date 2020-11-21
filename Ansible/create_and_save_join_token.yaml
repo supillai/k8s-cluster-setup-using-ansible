@@ -1,6 +1,6 @@
 ---
 - hosts: "{{hostlist}}"
-  remote_user: ubuntu
+  remote_user: "{{ansible_user}}"
   become: yes
   become_method: sudo
   gather_facts: yes

@@ -220,7 +220,7 @@ Also you need to specify an overlay network, i use Flannel in this case. You can
 
     tasks:
       - name: Intilizing Kubernetes Cluster
-        command: kubeadm init --pod-network-cidr "192.168.57.0/24"  --apiserver-advertise-address "{{ k8s_master_ip }}" --v 5
+        command: kubeadm init --pod-network-cidr "10.244.0.0/16"  --apiserver-advertise-address "{{ k8s_master_ip }}" --v 5
         run_once: true
         delegate_to: "{{ k8s_master_ip }}"
 

@@ -369,10 +369,9 @@ Also you need to specify an overlay network, i use Flannel in this case. You can
   ```
 </details>
 
-## How to run the playbook
+## How to run the playbook to create the cluster
 
-Ansible playbook can be found here [init.yaml](Ansible/init.yaml). You must specify a list of hosts and vm user as parameter to each of the playbooks below.
-
+Ansible playbook can be found here [init.yaml](Ansible/init.yaml).
 You can run the playbook using the below command.  -K argument let you specify the sudo password.
 
 -  ansible-playbook -i hosts init.yaml -K
@@ -410,6 +409,7 @@ deployment.apps/nginx scaled
   Now you should be able to access nginx home page by accessing http://< worker node ip>:32013
 
 ## What if installation fail?
--  Run 'kubeadm reset --ignore-preflight-errors=all' in all the nodes
+-  Run 'sudo kubeadm reset --ignore-preflight-errors=all' in all the nodes
+  -  Please read the output of above command and do the recommended manual cleanups as suggested.
 -  Run playbook again 'ansible-playbook -i hosts init.yaml -K'
 

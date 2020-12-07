@@ -14,7 +14,7 @@ I was exploring the possibility of automating many of the node setup tasks durin
 
 ## Prerequisites
   - Downlod and install VirtualBox-6.1.16 from https://www.virtualbox.org/wiki/Downloads
-    - Install Ansible - If you are in windows, you can run below powershell script to install Ansible on Cygwwin. For others please follow platform specific instruction to install Ansible.
+  - Install Ansible - If you are in windows, you can run below powershell script to install Ansible on Cygwwin. For others please follow platform specific instruction to install Ansible.
 ```powershell
 Invoke-Expression ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
 choco install cyg-get
@@ -45,7 +45,7 @@ cyg-get rsync ncurses openssh python37 python37-certifi python37-cryptography py
   Now if you try 'ip a', it should list the static ip addess you specified associated with enp0s8 adapter. If you want your node to have internet access, make sure you chose default NAT adapter as primary network adapter and host-only adapter as the second one.  This way your host can SSH into your VM via private ip address you specified and VM can access the internet using NAT adapter
 
 
-    - Configure SSH - Configure SSH access with the keypair, place the public key into the ~/.ssh/authorized_keys file for the user in each of the nodes and controlplane node. This is needed as by default Ansible uses SSH keys to connect to remote machines. More information about setting up SSH keys can be found here https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#generating-and-working-with-ssh-keys
+  - Configure SSH - Configure SSH access with the keypair, place the public key into the ~/.ssh/authorized_keys file for the user in each of the nodes and controlplane node. This is needed as by default Ansible uses SSH keys to connect to remote machines. More information about setting up SSH keys can be found here https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#generating-and-working-with-ssh-keys
 
 You can copy the public key into the ~/.ssh/authorized_keys using below powershell command.
 ```powershell

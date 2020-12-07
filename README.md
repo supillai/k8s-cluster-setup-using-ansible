@@ -47,9 +47,9 @@ cyg-get rsync ncurses openssh python37 python37-certifi python37-cryptography py
 
   - Configure SSH - Configure SSH access with the keypair, place the public key into the ~/.ssh/authorized_keys file for the user in each of the nodes and controlplane node. This is needed as by default Ansible uses SSH keys to connect to remote machines. More information about setting up SSH keys can be found here https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#generating-and-working-with-ssh-keys
 
-You can copy the public key into the ~/.ssh/authorized_keys using below powershell command.
+You can copy the public key into the ~/.ssh/authorized_keys using below powershell command. Replace user@ipaddress with valid values.
 ```powershell
-type $env:USERPROFILE\.ssh\id_rsa.pub | ssh k8s@192.168.56.21 "cat >> .ssh/authorized_keys"
+type $env:USERPROFILE\.ssh\id_rsa.pub | ssh user@ipaddress "cat >> .ssh/authorized_keys"
 ```
 ## Steps to create a Kubernetes cluster
 
@@ -200,7 +200,9 @@ Below playbook installs kubernetes and all the needed dependencies into the host
 
 Below playbook configure the controlplane node. You need to specify the Apiserver advertise address, which usually is the controlplane nodes ip address. You need to specify pod-network-cidr which should be in a different subnet than host. Kubernetes assigns each node a range of IP addresses, a CIDR block, so that each Pod can have a unique IP address. The size of the CIDR block corresponds to the maximum number of Pods per node. if you want to specify the pod network same as host, you can see the stackoverflow tip here https://stackoverflow.com/questions/45687310/is-it-possible-to-join-a-hardware-in-the-same-subnet-with-kubernetes-pods. 
 
-Also you need to specify an overlay network, i use Flannel in this case. You can read more information about here https://kubernetes.io/docs/concepts/cluster-administration/networking/
+Also you need to specify an overlay network, i use Flannel in this case. You can read more information about here https://kubernetes.io/docs/concepts/cluster-administration/networking/. 
+
+### Note: When specifying --pod-network-cidr make sure you specify the same as in kube-flannel.yml, else MetalLB configuration doesn't work
 
   ```yaml
   - hosts: "{{hostlist}}"

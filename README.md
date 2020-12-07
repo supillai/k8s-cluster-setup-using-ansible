@@ -48,6 +48,11 @@ If you use bridge adapter and host using wifi, then it is possible ip addresses 
 
 ### Configure SSH
 Configure SSH access with the keypair, place the public key into the ~/.ssh/authorized_keys file for the user in each of the nodes and controlplane node. This is needed as by default Ansible uses SSH keys to connect to remote machines. More information about setting up SSH keys can be found here https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#generating-and-working-with-ssh-keys
+
+Ypu can copy the public key into the ~/.ssh/authorized_keys using below powershell command.
+```powershell
+type $env:USERPROFILE\.ssh\id_rsa.pub | ssh k8s@192.168.56.21 "cat >> .ssh/authorized_keys"
+```
 ### Install Ansible
 #### If you are in windows, you can run below powershell script to install Ansible on Cygwwin. For others please follow platform specific instruction to install Ansible.
 ```powershell

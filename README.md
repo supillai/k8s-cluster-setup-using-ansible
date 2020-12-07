@@ -421,3 +421,5 @@ deployment.apps/nginx scaled
   -  Please read the output of above command and do the recommended manual cleanups as suggested.
 -  Run playbook again 'ansible-playbook -i hosts init.yaml -K'
 
+## Setup MetalLB
+work in progress, to be added

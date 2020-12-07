@@ -1,29 +1,30 @@
-# Kubernetes setup using Ansible
+# Building a Kubernetes Cluster with MetalLB as load-balancer
 
-For the last decade, I worked on different programming languages and frameworks but never got a chance to play around with Kubernetes aka k8s. Documentation on the k8s project page is excellent, but it is evolving very rapidly.  Now my immediate goal is to set up a k8s cluster and play around with it. One sure-fire way to learn something new is to play around with it on your playground.  
-
-## How to setup a cluster?
+For the last decade, I worked on different programming languages and frameworks but never got a chance to experiment with Kubernetes aka k8s. Documentation on the k8s project page is excellent, but it is evolving very rapidly.  Now my immediate goal is to set up a k8s cluster and setup MetalLB as load-balancer.
 
 There are many ways you can set up a k8s cluster for experiment and learning. You can use a cloud provider or VPS or set up locally.  In this instance, I am going to use VirtualBox to set up a k8s cluster. The reason I chose VirtualBox is, I can run the cluster on my laptop which is an Intel(R) Core(TM) i7-4810MQ CPU @ 2.80GHz (8 CPUs), ~2.8GHz running windows 10
 
 I am going to create a Kubernetes cluster with a single control plane node and three worker nodes. Control plane and worker nodes are virtual machines running on VirtualBox with ubuntu server 20.04 focal fossa guests on Windows 10 host.  The control plane node is responsible for managing the state of the cluster whereas worker nodes are the servers where the workload is executed. The control plane node needs a minimum of 2 virtual CPUs.
 
+I have tested this on bare-metal setup and can confirm below instructions works there too. 
+
 ## Can i automate some of the tasks?
 
-I am a big fan of automating trivial tasks. I was exploring the possibility of automating many of the node setup tasks during the cluster creation. I found Ansible is a good framework to do the automation and am going to use the same throughout whenever possible. Cluster creation is fully automated using Ansible.
+I was exploring the possibility of automating many of the node setup tasks during the cluster creation. I found Ansible is a good framework to do the automation and am going to use the same throughout whenever possible. Cluster creation is fully automated using Ansible.
 
-## What are the steps?
 ## Prerequisites
-### Install VirtualBox
-- Downlod and  VirtualBox-6.1.16 from https://www.virtualbox.org/wiki/Downloads
-### Create virtual machines with ubuntu server 20.04 focal fossa
-  - Downlod iso file from https://releases.ubuntu.com/20.04/
-  - Create a new virtual machine using virtualbox using the iso downloaded in above step. Instructions for creating a VM can be found here https://oracle-base.com/articles/vm/virtualbox-creating-a-new-vm
-### Setup host-only network with static ip's or configure bridge mode
-#### Setup host-only network
-Instructions to create host-only network can be found here https://carleton.ca/scs/tech-support/troubleshooting-guides/host-only-adapter-on-virtualbox/ . Please note you do not need to enable DHCP server as specified in the article as our goal is to setup static ip addresses for the host.
-#### Setup static ip addess on ubuntu sever
-In the newer version of Ubuntu, you have to use a tool called 'neplan' to manage network settings. You can create a new yaml file 'sudo vi /etc/netplan/01-netcfg.yaml' and place the following contents into it Please note the ip address you specify has to be in same subnet as host-only adapter
+  - Downlod and install VirtualBox-6.1.16 from https://www.virtualbox.org/wiki/Downloads
+    - Install Ansible - If you are in windows, you can run below powershell script to install Ansible on Cygwwin. For others please follow platform specific instruction to install Ansible.
+```powershell
+Invoke-Expression ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+choco install cyg-get
+cyg-get rsync ncurses openssh python37 python37-certifi python37-cryptography python37-jinja2 python37-jmespath python37-passlib python37-pypsrp python37-requests python37-urllib3 python37-winrm python37-yaml sshpass ansible
+```
+  - Get each server ready to run Kubernetes
+    - Downlod iso file from https://releases.ubuntu.com/20.04/
+    - Create a new virtual machine using virtualbox using the iso downloaded in above step. Instructions for creating a VM can be found here https://oracle-base.com/articles/vm/virtualbox-creating-a-new-vm
+    - Setup host-only network - Instructions to create host-only network can be found here https://carleton.ca/scs/tech-support/troubleshooting-guides/host-only-adapter-on-virtualbox/ . Please note you do not need to enable DHCP server as specified in the article as our goal is to setup static ip addresses for the host.
+    - Setup static ip addess on ubuntu server - In the newer version of Ubuntu, you have to use a tool called 'neplan' to manage network settings. You can create a new yaml file 'sudo vi /etc/netplan/01-netcfg.yaml' and place the following contents into it Please note the ip address you specify has to be in same subnet as host-only adapter
 
   ```yaml
   network:
@@ -42,27 +43,17 @@ In the newer version of Ubuntu, you have to use a tool called 'neplan' to manage
   ```
   
   Now if you try 'ip a', it should list the static ip addess you specified associated with enp0s8 adapter. If you want your node to have internet access, make sure you chose default NAT adapter as primary network adapter and host-only adapter as the second one.  This way your host can SSH into your VM via private ip address you specified and VM can access the internet using NAT adapter
-  
-#### Warning about bridge adapters
-If you use bridge adapter and host using wifi, then it is possible ip addresses of the host will change after reboot which brokes the cluster networking.
 
-### Configure SSH
-Configure SSH access with the keypair, place the public key into the ~/.ssh/authorized_keys file for the user in each of the nodes and controlplane node. This is needed as by default Ansible uses SSH keys to connect to remote machines. More information about setting up SSH keys can be found here https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#generating-and-working-with-ssh-keys
 
-Ypu can copy the public key into the ~/.ssh/authorized_keys using below powershell command.
+    - Configure SSH - Configure SSH access with the keypair, place the public key into the ~/.ssh/authorized_keys file for the user in each of the nodes and controlplane node. This is needed as by default Ansible uses SSH keys to connect to remote machines. More information about setting up SSH keys can be found here https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#generating-and-working-with-ssh-keys
+
+You can copy the public key into the ~/.ssh/authorized_keys using below powershell command.
 ```powershell
 type $env:USERPROFILE\.ssh\id_rsa.pub | ssh k8s@192.168.56.21 "cat >> .ssh/authorized_keys"
 ```
-### Install Ansible
-#### If you are in windows, you can run below powershell script to install Ansible on Cygwwin. For others please follow platform specific instruction to install Ansible.
-```powershell
-Invoke-Expression ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
-choco install cyg-get
-cyg-get rsync ncurses openssh python37 python37-certifi python37-cryptography python37-jinja2 python37-jmespath python37-passlib python37-pypsrp python37-requests python37-urllib3 python37-winrm python37-yaml sshpass ansible
-```
-## Following are the steps Ansible playbook is going to do
+## Steps to create a Kubernetes cluster
 
-Ansible playbook can be found here [init.yaml](Ansible/init.yaml). To make main playbook readable, each of the below steps is implemented in its own playbook file and imported into main playbook. Below are the steps needed to configure a working kubernetes cluster. Expand the node to see the details. You must specify a list of hosts and vm user as parameter to each of the playbooks below.
+Following are the steps needed to setup a kubernetes cluster. Expand the node to see the details.
 
 <details>
   <summary>Disable swap on the control plane and worker node</summary>
@@ -377,6 +368,8 @@ Also you need to specify an overlay network, i use Flannel in this case. You can
 </details>
 
 ## How to run the playbook
+
+Ansible playbook can be found here [init.yaml](Ansible/init.yaml). You must specify a list of hosts and vm user as parameter to each of the playbooks below.
 
 You can run the playbook using the below command.  -K argument let you specify the sudo password.
 

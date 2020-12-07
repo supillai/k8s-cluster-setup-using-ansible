@@ -377,7 +377,10 @@ You can run the playbook using the below command.  -K argument let you specify t
 -  ansible-playbook -i hosts init.yaml -K
 ## How to check installation went ok?
 
-Run the below commands see similar output as below.
+
+<details>
+  <summary>Run the below commands see similar output as below. Expand the node to see details.
+</summary>
 
   ```sh
 k8s@k8smaster:~$ k8s@k8smaster:~$ kubectl get services
@@ -390,7 +393,12 @@ k8sworker1   Ready    <none>   4m57s   v1.19.4
 k8sworker2   Ready    <none>   4m55s   v1.19.4
 k8s@k8smaster:~$
   ```
-## Test deploying a container
+</details>
+
+
+<details>
+  <summary>Test deploying a container. Expand the node to see details.
+</summary>
 
 SSH to control plane node , execute the below commands. similar output can be expected. 
   ```sh
@@ -405,9 +413,9 @@ nginx        NodePort    10.98.52.3   <none>        80:32013/TCP   10s
 k8s@k8smaster:~$kubectl scale deployment.v1.apps/nginx --replicas=2
 deployment.apps/nginx scaled
   ```
+   Now you should be able to access nginx home page by accessing http://< worker node ip>:32013
+  </details>
   
-  Now you should be able to access nginx home page by accessing http://< worker node ip>:32013
-
 ## What if installation fail?
 -  Run 'sudo kubeadm reset --ignore-preflight-errors=all' in all the nodes
   -  Please read the output of above command and do the recommended manual cleanups as suggested.
